@@ -33,7 +33,7 @@
     <header>
       <div>
         <h1>Surah Al‑Fatiha — Listen or Record (Game)</h1>
-        <p class="lead">Choose to listen to a recitation or record your own reading, then compare. No recitation is embedded — you can upload or provide a URL.</p>
+        <p class="lead">Listen to a recitation or record your own reading, then compare. The original recitation is built-in and ready to play.</p>
       </div>
     </header>
 
@@ -42,14 +42,8 @@
         <h2 style="margin-top:0;font-size:16px">Play / Record</h2>
 
         <div style="margin-bottom:8px">
-          <label class="small">Original recitation (upload or paste URL)</label>
+          <label class="small">Original recitation (built-in)</label>
           <div style="display:flex;gap:8px;margin-top:6px">
-            <input id="urlInput" type="text" placeholder="Paste an audio URL (mp3/ogg)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit" />
-            <button id="setUrl">Use URL</button>
-          </div>
-          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-            <label for="fileInput" style="cursor:pointer"><button>Upload audio</button></label>
-            <input id="fileInput" type="file" accept="audio/*" />
             <button id="playOriginal" class="primary">Play Original</button>
           </div>
         </div>
@@ -76,9 +70,8 @@
           <label class="small">Compare</label>
           <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
             <button id="compareBtn">Play: Original → Yours</button>
-            <button id="shuffleBtn">Randomized Challenge</button>
           </div>
-          <p class="hint">The randomized challenge will sometimes ask you to record after hearing a short prompt.</p>
+          <p class="hint">Play original then your recording for comparison.</p>
         </div>
 
         <div class="log" id="log" aria-live="polite"></div>
@@ -91,7 +84,7 @@
         <h3 style="margin-top:12px">Audio players</h3>
         <div>
           <div><strong>Original</strong></div>
-          <audio id="originalPlayer" controls></audio>
+          <audio id="originalPlayer" controls preload="auto" src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/1.mp3"></audio>
         </div>
         <div style="margin-top:10px">
           <div><strong>Your recording</strong></div>
@@ -99,7 +92,7 @@
         </div>
 
         <footer>
-          <div style="margin-top:12px"><strong>Note:</strong> This app does not include a recitation by default. Please upload a file or paste a URL to an audio recitation of Surah Al‑Fatiha, or record your own.</div>
+          <div style="margin-top:12px"><strong>Note:</strong> This app includes a built-in Surah Al-Fatiha recitation by Sheikh Mishary Rashid Alafasy. You can also record your own recitation and compare.</div>
         </footer>
       </aside>
     </div>
@@ -107,7 +100,6 @@
 
   <script>
     // Elements
-    const fileInput = document.getElementById('fileInput');
     const originalPlayer = document.getElementById('originalPlayer');
     const minePlayer = document.getElementById('minePlayer');
     const playOriginalBtn = document.getElementById('playOriginal');
@@ -119,34 +111,18 @@
     const statusEl = document.getElementById('status');
     const levelBar = document.getElementById('levelBar');
     const compareBtn = document.getElementById('compareBtn');
-    const shuffleBtn = document.getElementById('shuffleBtn');
-    const urlInput = document.getElementById('urlInput');
-    const setUrlBtn = document.getElementById('setUrl');
 
     function log(msg){
       const time = new Date().toLocaleTimeString();
       logEl.innerHTML = `<div>[${time}] ${msg}</div>` + logEl.innerHTML;
     }
 
-    // Allow user to set URL
-    setUrlBtn.addEventListener('click', ()=>{
-      const url = urlInput.value.trim();
-      if(!url){ alert('Paste an audio URL first.'); return; }
-      originalPlayer.src = url;
-      log('Set original audio from URL.');
-    });
-
-    // File upload
-    fileInput.addEventListener('change', (e)=>{
-      const f = e.target.files[0];
-      if(!f) return;
-      const url = URL.createObjectURL(f);
-      originalPlayer.src = url;
-      log('Original audio loaded from uploaded file.');
-    });
-
-    playOriginalBtn.addEventListener('click', ()=>{
-      if(!originalPlayer.src){ alert('No original audio selected. Upload or paste a URL.'); return; }
+    playOriginalBtn.addEventListener('click', () => {
+      if(!originalPlayer.src){
+        alert('Original audio missing!');
+        return;
+      }
+      originalPlayer.currentTime = 0;
       originalPlayer.play();
       log('Playing original recitation.');
     });
@@ -167,7 +143,7 @@
         return;
       }
 
-      // Visual level (very simple)
+      // Visual level (simple)
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const source = audioCtx.createMediaStreamSource(localStream);
       const analyser = audioCtx.createAnalyser();
@@ -187,7 +163,7 @@
 
       mediaRecorder = new MediaRecorder(localStream);
       mediaRecorder.ondataavailable = e => { if(e.data.size>0) recordedChunks.push(e.data); };
-      mediaRecorder.onstop = ()=>{
+      mediaRecorder.onstop = () => {
         cancelAnimationFrame(rafId);
         levelBar.style.width = '0%';
         const blob = new Blob(recordedChunks, {type: 'audio/webm'});
@@ -213,20 +189,20 @@
     }
 
     startRecordBtn.addEventListener('click', startRecording);
-    stopRecordBtn.addEventListener('click', ()=>{
+    stopRecordBtn.addEventListener('click', () => {
       if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
       startRecordBtn.disabled = false;
       stopRecordBtn.disabled = true;
       statusEl.textContent = 'Idle';
     });
 
-    playMineBtn.addEventListener('click', ()=>{
+    playMineBtn.addEventListener('click', () => {
       if(!minePlayer.src) return;
       minePlayer.play();
       log('Playing your recording.');
     });
 
-    downloadMineBtn.addEventListener('click', ()=>{
+    downloadMineBtn.addEventListener('click', () => {
       if(!audioUrlMine){ alert('No recording available'); return; }
       const a = document.createElement('a');
       a.href = audioUrlMine;
@@ -236,8 +212,8 @@
     });
 
     // Compare: play original then user's recording
-    compareBtn.addEventListener('click', async ()=>{
-      if(!originalPlayer.src){ alert('Select an original audio first'); return; }
+    compareBtn.addEventListener('click', async () => {
+      if(!originalPlayer.src){ alert('Original audio missing!'); return; }
       if(!minePlayer.src){ alert('Record your reading first'); return; }
       statusEl.textContent = 'Comparing: playing original → yours';
       log('Comparison: playing original then your recording.');
@@ -252,42 +228,18 @@
     });
 
     function waitForEvent(target, ev){
-      return new Promise(res => { target.addEventListener(ev, function handler(){ target.removeEventListener(ev,handler); res(); }); });
+      return new Promise(res => {
+        target.addEventListener(ev, function handler(){
+          target.removeEventListener(ev, handler);
+          res();
+        });
+      });
     }
 
-    // Randomized challenge: sometimes require player to record after hearing a short prompt
-    shuffleBtn.addEventListener('click', async ()=>{
-      // Simple game: play 3-second clip of original (if exists) then ask user to record trying to imitate tone/pace for 15 sec
-      if(!originalPlayer.src){ alert('Please select an original audio first (upload or URL).'); return; }
-      log('Randomized challenge started.');
-      statusEl.textContent = 'Challenge: listening...';
-      originalPlayer.currentTime = 0;
-      const clipDuration = Math.min(6, originalPlayer.duration || 6);
-      originalPlayer.play();
-      // stop after clipDuration seconds
-      await new Promise(r => setTimeout(r, clipDuration * 1000));
-      originalPlayer.pause();
-      originalPlayer.currentTime = 0;
-      log('Now record your attempt. You will have 15 seconds.');
-      // start recording automatically if possible
-      try{
-        await startRecording();
-        // limit recording to 15 seconds
-        setTimeout(()=>{
-          if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-          startRecordBtn.disabled = false;
-          stopRecordBtn.disabled = true;
-          statusEl.textContent = 'Idle';
-        },15000);
-      }catch(e){
-        log('Could not start recording automatically.');
-      }
-    });
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => stopStream(localStream));
 
-    // Utility: ensure we don't leave camera on
-    window.addEventListener('beforeunload', ()=> stopStream(localStream));
-
-    log('App ready — upload an audio or paste a URL to begin.');
+    log('App ready — press "Play Original" to listen to Surah Al-Fatiha.');
   </script>
 </body>
 </html>
