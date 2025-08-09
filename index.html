@@ -3,165 +3,188 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Suurada Al-Faatixa — Dhageyso ama codkaada ku  Duub</title>
+  <title>Ciyaarta Suurada Al-Faatixa — Dhageyso ama Duub</title>
   <style>
-    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;color-scheme:dark}
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
-    body{background:linear-gradient(180deg,#08101a 0%,#08121a 60%);color:#e6eef6;display:flex;align-items:center;justify-content:center;padding:24px}
-    .app{width:980px;max-width:100%;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:14px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-    header{display:flex;gap:12px;align-items:center}
-    h1{margin:0;font-size:20px}
-    p.lead{margin:6px 0 18px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
-    .card{background:rgba(255,255,255,0.02);padding:14px;border-radius:10px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    button{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:8px;color:inherit;cursor:pointer}
-    button.primary{background:linear-gradient(90deg,var(--accent),#60a5fa);color:#04202a;border:none}
-    button.danger{background:#ef4444;color:white;border:none}
-    input[type=file]{display:none}
-    .small{font-size:13px;color:var(--muted)}
-    .meter{height:8px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
-    .meter > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#60a5fa)}
-    audio{width:100%;margin-top:10px}
-    .log{margin-top:12px;font-size:13px;color:var(--muted);max-height:160px;overflow:auto;padding:8px;background:rgba(255,255,255,0.01);border-radius:8px}
-    footer{margin-top:12px;font-size:13px;color:var(--muted)}
-    .hint{font-size:13px;color:var(--muted);margin-top:8px}
+    :root {
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #06b6d4;
+      --muted: #94a3b8;
+      color-scheme: dark;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, #08101a 0%, #08121a 60%);
+      color: #e6eef6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .app {
+      width: 600px;
+      max-width: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    header {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    p.lead {
+      margin: 6px 0 18px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 16px;
+    }
+    .card {
+      background: rgba(255,255,255,0.02);
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    button {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 12px 18px;
+      border-radius: 8px;
+      color: inherit;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      transition: background-color 0.25s ease;
+    }
+    button.primary {
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      color: #04202a;
+      border: none;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    audio {
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 8px;
+      outline: none;
+    }
+    footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--muted);
+      text-align: center;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
   <div class="app" role="application" aria-label="Ciyaarta Suurada Al-Faatixa">
     <header>
-      <div>
-        <h1>Suurada Al-Faatixa — Dhageyso ama Duub (Ciyaar)</h1>
-        <p class="lead">Dhageyso  ama duub akhriskaaga, ka dib isbarbar dhig. codka asalka ah oo horay loo soo geliyey.</p>
-      </div>
+      <h1>Suurada Al-Faatixa — Dhageyso ama Duub</h1>
+      <p class="lead">Dhageyso tilmaan ama duub akhriskaaga, ka dibna soo dejiso.</p>
     </header>
 
-    <div class="grid" style="margin-top:12px">
-      <section class="card" aria-label="Xakamaynta Muhiimka ah">
-        <h2 style="margin-top:0;font-size:16px">Ciyaar / Duub</h2>
+    <section class="card" aria-label="Xakamaynta Muhiimka ah">
+      <button id="playOriginal" class="primary">Ciyaar Tilmaan</button>
+      <button id="startRecord">Bilow Duubista</button>
+      <button id="stopRecord" disabled>Jooji</button>
+      <button id="downloadMine" disabled>Download</button>
 
-        <div style="margin-bottom:8px">
-          <label class="small">codadka Asalka ah (horay loo soo geliyey)</label>
-          <div style="display:flex;gap:8px;margin-top:6px">
-            <button id="playOriginal" class="primary">Ciyaar Tilmaan</button>
-          </div>
-        </div>
+      <audio id="originalPlayer" controls preload="auto" src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/1.mp3"></audio>
+      <audio id="minePlayer" controls></audio>
+    </section>
 
-        <hr style="opacity:0.06;margin:12px 0" />
+    <footer>
+      Boggan waxa horumariyey oo naqshadeeyey Ahmed Abdi Hassan (Ashraf).
+    </footer>
 
-        <div>
-          <label class="small">Duub Akhriskaaga</label>
-          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-            <button id="startRecord">Bilow Duubista</button>
-            <button id="stopRecord" disabled>Jooji</button>
-            <button id="playMine" disabled>Ciyaar Duubistayda</button>
-            <button id="downloadMine" disabled>Download</button>
-          </div>
-          <div style="margin-top:10px">
-            <div class="meter" aria-hidden="true"><i id="levelBar"></i></div>
-            <div class="hint">Heerka makarafoonka ayaa muuqan doona inta lagu jiro duubista. Fadlan oggolow helitaanka makarafoonka marka la codsado.</div>
-          </div>
-        </div>
+    <script>
+      const originalPlayer = document.getElementById('originalPlayer');
+      const minePlayer = document.getElementById('minePlayer');
+      const playOriginalBtn = document.getElementById('playOriginal');
+      const startRecordBtn = document.getElementById('startRecord');
+      const stopRecordBtn = document.getElementById('stopRecord');
+      const downloadMineBtn = document.getElementById('downloadMine');
 
-        <hr style="opacity:0.06;margin:12px 0" />
+      let mediaRecorder = null;
+      let recordedChunks = [];
+      let localStream = null;
+      let audioUrlMine = '';
 
-        <div>
-          <label class="small">Isbarbar dhig</label>
-          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-            <button id="compareBtn">Ciyaar: Tilmaan → Adiga</button>
-          </div>
-          <p class="hint">Dhageyso tilmaan ka dibna duubistaada si aad u isbarbar dhigto.</p>
-        </div>
+      playOriginalBtn.addEventListener('click', () => {
+        originalPlayer.currentTime = 0;
+        originalPlayer.play();
+      });
 
-        <div class="log" id="log" aria-live="polite"></div>
-      </section>
+      async function startRecording(){
+        recordedChunks = [];
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        } catch(err) {
+          alert('Helitaanka makarafoonka waa la diiday ama ma heli karo.');
+          return;
+        }
 
-      <aside class="card" aria-label="Xaalada & caawimaad">
-        <h3 style="margin-top:0">Xaalada</h3>
-        <div id="status">Fadhiid</div>
+        mediaRecorder = new MediaRecorder(localStream);
+        mediaRecorder.ondataavailable = e => {
+          if(e.data.size > 0) recordedChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, {type: 'audio/webm'});
+          if(audioUrlMine) URL.revokeObjectURL(audioUrlMine);
+          audioUrlMine = URL.createObjectURL(blob);
+          minePlayer.src = audioUrlMine;
+          downloadMineBtn.disabled = false;
+          stopStream(localStream);
+        };
 
-        <h3 style="margin-top:12px">Ciyaartoyda Maqalka</h3>
-        <div>
-          <div><strong>Tilmaanta Asalka ah</strong></div>
-          <audio id="originalPlayer" controls preload="auto" src="https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/1.mp3"></audio>
-        </div>
-        <div style="margin-top:10px">
-          <div><strong>Duubistaada</strong></div>
-          <audio id="minePlayer" controls></audio>
-        </div>
+        mediaRecorder.start();
+        startRecordBtn.disabled = true;
+        stopRecordBtn.disabled = false;
+        downloadMineBtn.disabled = true;
+      }
 
-        <footer>
-          <div style="margin-top:12px">
-            <strong>Ogeysiis:</strong> Barnaamijkan waxa ku jira tilmaan horay loo soo geliyey oo Surada Al-Faatixa ah oo uu akhrinayo Sheekh Mishary Rashid Alafasy. Waxa kale oo aad duubi kartaa akhriskaaga oo aad isbarbar dhig kartaa.
-          </div>
-          <div style="margin-top:12px; font-style: italic; color: #94a3b8;">
-            Boggan waxa horumariyey oo naqshadeeyey Ahmed Abdi Hassan (Ashraf).
-          </div>
-        </footer>
-      </aside>
-    </div>
+      function stopStream(stream){
+        if(!stream) return;
+        stream.getTracks().forEach(t => t.stop());
+      }
+
+      startRecordBtn.addEventListener('click', startRecording);
+
+      stopRecordBtn.addEventListener('click', () => {
+        if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+        startRecordBtn.disabled = false;
+        stopRecordBtn.disabled = true;
+      });
+
+      downloadMineBtn.addEventListener('click', () => {
+        if(!audioUrlMine) {
+          alert('Duubis ma jirto oo la soo dejiyo');
+          return;
+        }
+        const a = document.createElement('a');
+        a.href = audioUrlMine;
+        a.download = 'duubis-surah.webm';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+
+      // Clean up on page unload
+      window.addEventListener('beforeunload', () => stopStream(localStream));
+    </script>
   </div>
-
-  <script>
-    // Elements
-    const originalPlayer = document.getElementById('originalPlayer');
-    const minePlayer = document.getElementById('minePlayer');
-    const playOriginalBtn = document.getElementById('playOriginal');
-    const startRecordBtn = document.getElementById('startRecord');
-    const stopRecordBtn = document.getElementById('stopRecord');
-    const playMineBtn = document.getElementById('playMine');
-    const downloadMineBtn = document.getElementById('downloadMine');
-    const logEl = document.getElementById('log');
-    const statusEl = document.getElementById('status');
-    const levelBar = document.getElementById('levelBar');
-    const compareBtn = document.getElementById('compareBtn');
-
-    function log(msg){
-      const time = new Date().toLocaleTimeString();
-      logEl.innerHTML = `<div>[${time}] ${msg}</div>` + logEl.innerHTML;
-    }
-
-    playOriginalBtn.addEventListener('click', () => {
-      if(!originalPlayer.src){
-        alert('Tilmaanta asalka ah maqan tahay!');
-        return;
-      }
-      originalPlayer.currentTime = 0;
-      originalPlayer.play();
-      log('Tilmaanta asalka ah ayaa la ciyaarayaa.');
-    });
-
-    // Recording setup
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let localStream = null;
-    let audioUrlMine = '';
-
-    async function startRecording(){
-      recordedChunks = [];
-      try{
-        localStream = await navigator.mediaDevices.getUserMedia({audio:true});
-      }catch(err){
-        alert('Helitaanka makarafoonka waa la diiday ama ma heli karo.');
-        log('Khalad helitaanka makarafoonka: ' + err.message);
-        return;
-      }
-
-      // Visual level (simple)
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioCtx.createMediaStreamSource(localStream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      const data = new Uint8Array(analyser.frequencyBinCount);
-      let rafId;
-      function updateMeter(){
-        analyser.getByteFrequencyData(data);
-        let sum = 0; for(let i=0;i<data.length;i++) sum += data[i];
-        const avg = sum / data.length; // 0-255
-        const pct = Math.min(100, Math.round((avg/128)*100));
-        levelBar.style.width = pct + '%';
-        rafId = requestAnimationFrame(updateMeter);
-      }
-      updateMeter();
+</body>
+</html>
