@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Surah Al-Fatiha Game — Listen or Record</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;color-scheme:dark}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+    body{background:linear-gradient(180deg,#08101a 0%,#08121a 60%);color:#e6eef6;display:flex;align-items:center;justify-content:center;padding:24px}
+    .app{width:980px;max-width:100%;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:14px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+    header{display:flex;gap:12px;align-items:center}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:6px 0 18px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    .card{background:rgba(255,255,255,0.02);padding:14px;border-radius:10px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    button{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:8px;color:inherit;cursor:pointer}
+    button.primary{background:linear-gradient(90deg,var(--accent),#60a5fa);color:#04202a;border:none}
+    button.danger{background:#ef4444;color:white;border:none}
+    input[type=file]{display:none}
+    .small{font-size:13px;color:var(--muted)}
+    .meter{height:8px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+    .meter > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#60a5fa)}
+    audio{width:100%;margin-top:10px}
+    .log{margin-top:12px;font-size:13px;color:var(--muted);max-height:160px;overflow:auto;padding:8px;background:rgba(255,255,255,0.01);border-radius:8px}
+    footer{margin-top:12px;font-size:13px;color:var(--muted)}
+    .hint{font-size:13px;color:var(--muted);margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Surah Al-Fatiha game">
+    <header>
+      <div>
+        <h1>Surah Al‑Fatiha — Listen or Record (Game)</h1>
+        <p class="lead">Choose to listen to a recitation or record your own reading, then compare. No recitation is embedded — you can upload or provide a URL.</p>
+      </div>
+    </header>
+
+    <div class="grid" style="margin-top:12px">
+      <section class="card" aria-label="Main controls">
+        <h2 style="margin-top:0;font-size:16px">Play / Record</h2>
+
+        <div style="margin-bottom:8px">
+          <label class="small">Original recitation (upload or paste URL)</label>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <input id="urlInput" type="text" placeholder="Paste an audio URL (mp3/ogg)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit" />
+            <button id="setUrl">Use URL</button>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+            <label for="fileInput" style="cursor:pointer"><button>Upload audio</button></label>
+            <input id="fileInput" type="file" accept="audio/*" />
+            <button id="playOriginal" class="primary">Play Original</button>
+          </div>
+        </div>
+
+        <hr style="opacity:0.06;margin:12px 0" />
+
+        <div>
+          <label class="small">Record your reading</label>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+            <button id="startRecord">Start Recording</button>
+            <button id="stopRecord" disabled>Stop</button>
+            <button id="playMine" disabled>Play My Recording</button>
+            <button id="downloadMine" disabled>Download</button>
+          </div>
+          <div style="margin-top:10px">
+            <div class="meter" aria-hidden="true"><i id="levelBar"></i></div>
+            <div class="hint">Microphone level will show while recording. Allow microphone access when prompted.</div>
+          </div>
+        </div>
+
+        <hr style="opacity:0.06;margin:12px 0" />
+
+        <div>
+          <label class="small">Compare</label>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+            <button id="compareBtn">Play: Original → Yours</button>
+            <button id="shuffleBtn">Randomized Challenge</button>
+          </div>
+          <p class="hint">The randomized challenge will sometimes ask you to record after hearing a short prompt.</p>
+        </div>
+
+        <div class="log" id="log" aria-live="polite"></div>
+      </section>
+
+      <aside class="card" aria-label="Status & help">
+        <h3 style="margin-top:0">Status</h3>
+        <div id="status">Idle</div>
+
+        <h3 style="margin-top:12px">Audio players</h3>
+        <div>
+          <div><strong>Original</strong></div>
+          <audio id="originalPlayer" controls></audio>
+        </div>
+        <div style="margin-top:10px">
+          <div><strong>Your recording</strong></div>
+          <audio id="minePlayer" controls></audio>
+        </div>
+
+        <footer>
+          <div style="margin-top:12px"><strong>Note:</strong> This app does not include a recitation by default. Please upload a file or paste a URL to an audio recitation of Surah Al‑Fatiha, or record your own.</div>
+        </footer>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const fileInput = document.getElementById('fileInput');
+    const originalPlayer = document.getElementById('originalPlayer');
+    const minePlayer = document.getElementById('minePlayer');
+    const playOriginalBtn = document.getElementById('playOriginal');
+    const startRecordBtn = document.getElementById('startRecord');
+    const stopRecordBtn = document.getElementById('stopRecord');
+    const playMineBtn = document.getElementById('playMine');
+    const downloadMineBtn = document.getElementById('downloadMine');
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+    const levelBar = document.getElementById('levelBar');
+    const compareBtn = document.getElementById('compareBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const urlInput = document.getElementById('urlInput');
+    const setUrlBtn = document.getElementById('setUrl');
+
+    function log(msg){
+      const time = new Date().toLocaleTimeString();
+      logEl.innerHTML = `<div>[${time}] ${msg}</div>` + logEl.innerHTML;
+    }
+
+    // Allow user to set URL
+    setUrlBtn.addEventListener('click', ()=>{
+      const url = urlInput.value.trim();
+      if(!url){ alert('Paste an audio URL first.'); return; }
+      originalPlayer.src = url;
+      log('Set original audio from URL.');
+    });
+
+    // File upload
+    fileInput.addEventListener('change', (e)=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const url = URL.createObjectURL(f);
+      originalPlayer.src = url;
+      log('Original audio loaded from uploaded file.');
+    });
+
+    playOriginalBtn.addEventListener('click', ()=>{
+      if(!originalPlayer.src){ alert('No original audio selected. Upload or paste a URL.'); return; }
+      originalPlayer.play();
+      log('Playing original recitation.');
+    });
+
+    // Recording setup
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let localStream = null;
+    let audioUrlMine = '';
+
+    async function startRecording(){
+      recordedChunks = [];
+      try{
+        localStream = await navigator.mediaDevices.getUserMedia({audio:true});
+      }catch(err){
+        alert('Microphone access denied or not available.');
+        log('Microphone access error: ' + err.message);
+        return;
+      }
+
+      // Visual level (very simple)
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(localStream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      let rafId;
+      function updateMeter(){
+        analyser.getByteFrequencyData(data);
+        let sum = 0; for(let i=0;i<data.length;i++) sum += data[i];
+        const avg = sum / data.length; // 0-255
+        const pct = Math.min(100, Math.round((avg/128)*100));
+        levelBar.style.width = pct + '%';
+        rafId = requestAnimationFrame(updateMeter);
+      }
+      updateMeter();
+
+      mediaRecorder = new MediaRecorder(localStream);
+      mediaRecorder.ondataavailable = e => { if(e.data.size>0) recordedChunks.push(e.data); };
+      mediaRecorder.onstop = ()=>{
+        cancelAnimationFrame(rafId);
+        levelBar.style.width = '0%';
+        const blob = new Blob(recordedChunks, {type: 'audio/webm'});
+        if(audioUrlMine) URL.revokeObjectURL(audioUrlMine);
+        audioUrlMine = URL.createObjectURL(blob);
+        minePlayer.src = audioUrlMine;
+        playMineBtn.disabled = false;
+        downloadMineBtn.disabled = false;
+        stopStream(localStream);
+        log('Recording stopped and available for playback.');
+      };
+
+      mediaRecorder.start();
+      startRecordBtn.disabled = true;
+      stopRecordBtn.disabled = false;
+      statusEl.textContent = 'Recording...';
+      log('Recording started.');
+    }
+
+    function stopStream(stream){
+      if(!stream) return;
+      stream.getTracks().forEach(t => t.stop());
+    }
+
+    startRecordBtn.addEventListener('click', startRecording);
+    stopRecordBtn.addEventListener('click', ()=>{
+      if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      startRecordBtn.disabled = false;
+      stopRecordBtn.disabled = true;
+      statusEl.textContent = 'Idle';
+    });
+
+    playMineBtn.addEventListener('click', ()=>{
+      if(!minePlayer.src) return;
+      minePlayer.play();
+      log('Playing your recording.');
+    });
+
+    downloadMineBtn.addEventListener('click', ()=>{
+      if(!audioUrlMine){ alert('No recording available'); return; }
+      const a = document.createElement('a');
+      a.href = audioUrlMine;
+      a.download = 'my-surah-recording.webm';
+      document.body.appendChild(a); a.click(); a.remove();
+      log('Downloaded your recording.');
+    });
+
+    // Compare: play original then user's recording
+    compareBtn.addEventListener('click', async ()=>{
+      if(!originalPlayer.src){ alert('Select an original audio first'); return; }
+      if(!minePlayer.src){ alert('Record your reading first'); return; }
+      statusEl.textContent = 'Comparing: playing original → yours';
+      log('Comparison: playing original then your recording.');
+      originalPlayer.currentTime = 0; minePlayer.currentTime = 0;
+      originalPlayer.play();
+      await waitForEvent(originalPlayer, 'ended');
+      await new Promise(r=>setTimeout(r,300));
+      minePlayer.play();
+      await waitForEvent(minePlayer,'ended');
+      statusEl.textContent = 'Idle';
+      log('Comparison finished.');
+    });
+
+    function waitForEvent(target, ev){
+      return new Promise(res => { target.addEventListener(ev, function handler(){ target.removeEventListener(ev,handler); res(); }); });
+    }
+
+    // Randomized challenge: sometimes require player to record after hearing a short prompt
+    shuffleBtn.addEventListener('click', async ()=>{
+      // Simple game: play 3-second clip of original (if exists) then ask user to record trying to imitate tone/pace for 15 sec
+      if(!originalPlayer.src){ alert('Please select an original audio first (upload or URL).'); return; }
+      log('Randomized challenge started.');
+      statusEl.textContent = 'Challenge: listening...';
+      originalPlayer.currentTime = 0;
+      const clipDuration = Math.min(6, originalPlayer.duration || 6);
+      originalPlayer.play();
+      // stop after clipDuration seconds
+      await new Promise(r => setTimeout(r, clipDuration * 1000));
+      originalPlayer.pause();
+      originalPlayer.currentTime = 0;
+      log('Now record your attempt. You will have 15 seconds.');
+      // start recording automatically if possible
+      try{
+        await startRecording();
+        // limit recording to 15 seconds
+        setTimeout(()=>{
+          if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+          startRecordBtn.disabled = false;
+          stopRecordBtn.disabled = true;
+          statusEl.textContent = 'Idle';
+        },15000);
+      }catch(e){
+        log('Could not start recording automatically.');
+      }
+    });
+
+    // Utility: ensure we don't leave camera on
+    window.addEventListener('beforeunload', ()=> stopStream(localStream));
+
+    log('App ready — upload an audio or paste a URL to begin.');
+  </script>
+</body>
+</html>
